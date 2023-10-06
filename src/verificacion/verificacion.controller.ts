@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { VerificacionService } from './verificacion.service';
 import { CreateVerificacionDto } from './dto/create-verificacion.dto';
 import { UpdateVerificacionDto } from './dto/update-verificacion.dto';
+import { ParseMongoIdPipe } from 'src/common/pipes/parse-mongo-id-pipe/parse-mongo-id-pipe.pipe';
 
 @Controller('verificacion')
 export class VerificacionController {
@@ -29,7 +30,7 @@ export class VerificacionController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.verificacionService.remove(+id);
+  remove(@Param('id', ParseMongoIdPipe ) id: string) {
+    return this.verificacionService.remove(id);
   }
 }

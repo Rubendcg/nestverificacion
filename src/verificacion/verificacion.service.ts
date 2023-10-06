@@ -23,12 +23,7 @@ export class VerificacionService {
       return verificacion
       
     } catch (error) {
-      if( error.code === 11000){
-        console.log(error)
-        throw new BadRequestException(`El valor existe en la Base de datos ${ JSON.stringify(error.keyValue)}`)
-      }
-      console.log(error)
-      throw new InternalServerErrorException(`No se pudo Crear la verificación`)
+      this.handleException(error)
     }
   }
 
@@ -58,11 +53,34 @@ export class VerificacionService {
     if( updateVerificacionDto.placa)
       updateVerificacionDto.placa = updateVerificacionDto.placa.toLocaleLowerCase()
 
-      await (await verificacion).updateOne(updateVerificacionDto,{new: true})
-    return verificacion;
+      try {
+        await (await verificacion).updateOne(updateVerificacionDto,{new: true})
+        return {... (await verificacion).toJSON(),...updateVerificacionDto};
+
+      } catch (error) {
+        this.handleException(error)
+      }
+    
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} verificacion`;
+  async remove(id: string) {
+    // const verificacion = await this.findOne(id)
+    // await verificacion.deleteOne()
+    // const result = this.VerificacionModel.findByIdAndDelete(id)
+    const {deletedCount} = await this.VerificacionModel.deleteOne({_id:id })
+    if( deletedCount === 0){
+      throw new BadRequestException(`Verificacion con ID ${id} no encontrado`)
+    }
+    return 
+  }
+
+  private handleException(error: any){
+    if( error.code === 11000){
+      console.log(error)
+      throw new BadRequestException(`El valor existe en la Base de datos ${ JSON.stringify(error.keyValue)}`)
+    }
+    console.log(error)
+    throw new InternalServerErrorException(`No se pudo Crear la verificación`)
+
   }
 }
