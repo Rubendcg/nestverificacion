@@ -28,6 +28,7 @@ export class VerificacionService {
   }
 
   findAll() {
+    console.log('prueba git jejeje')
     return `This action returns all verificacion`;
   }
 
