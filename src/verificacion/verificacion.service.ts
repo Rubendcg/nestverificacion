@@ -4,13 +4,22 @@ import { UpdateVerificacionDto } from './dto/update-verificacion.dto';
 import { Model, isValidObjectId } from 'mongoose';
 import { Verificacion } from './entities/verificacion.entity';
 import { InjectModel } from '@nestjs/mongoose';
+import { PaginationDto } from 'src/common/dto/paginationDto.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class VerificacionService {
+
+  private defaultLimit: number
+
   constructor(
     @InjectModel( Verificacion.name)
-    private  readonly VerificacionModel: Model<Verificacion>
-  ){}
+    private  readonly VerificacionModel: Model<Verificacion>,
+    private readonly configService: ConfigService
+  ){
+    this.defaultLimit =configService.get<number>('defaullimit')
+    
+  }
   async create(createVerificacionDto: CreateVerificacionDto) {
     createVerificacionDto.placa = createVerificacionDto.placa.toLocaleLowerCase()
     createVerificacionDto.niv = createVerificacionDto.niv.toLocaleLowerCase()
@@ -27,9 +36,18 @@ export class VerificacionService {
     }
   }
 
-  findAll() {
-    console.log('prueba git jejeje')
-    return `This action returns all verificacion`;
+  findAll( paginationDto: PaginationDto ) {
+
+    const { limit = this.defaultLimit, offset = 0 } = paginationDto;
+
+    return this.VerificacionModel.find()
+      .limit( limit )
+      .skip( offset )
+      .sort({
+        no: 1
+      })
+      .select('-__v');
+      
   }
 
   async findOne(termino: string) {

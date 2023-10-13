@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { VerificacionService } from './verificacion.service';
 import { CreateVerificacionDto } from './dto/create-verificacion.dto';
 import { UpdateVerificacionDto } from './dto/update-verificacion.dto';
 import { ParseMongoIdPipe } from 'src/common/pipes/parse-mongo-id-pipe/parse-mongo-id-pipe.pipe';
+import { PaginationDto } from 'src/common/dto/paginationDto.dto';
 
 @Controller('verificacion')
 export class VerificacionController {
@@ -15,8 +16,8 @@ export class VerificacionController {
   }
 
   @Get()
-  findAll() {
-    return this.verificacionService.findAll();
+  findAll(@Query() paginationDto: PaginationDto) {
+    return this.verificacionService.findAll(paginationDto);
   }
 
   @Get(':termino')
